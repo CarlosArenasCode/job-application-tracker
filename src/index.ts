@@ -11,6 +11,21 @@ app.get('/api/status', (req: Request, res: Response) => {
     res.json({ status: 'online', message: 'Server is running smoothly!' });
 });
 
+app.get('/api/jobs', async (req: Request, res: Response) => {
+    try {
+        const jobs = await prisma.jobApplication.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+
+        res.status(200).json(jobs);
+    } catch (error) {
+        console.error('Error fetching job applications:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
+
 app.post('/api/jobs', async (req: Request, res: Response) =>{
     try {
         const { company, position, status, url, notes } = req.body;

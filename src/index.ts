@@ -6,7 +6,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// Health check endpoint
 app.get('/api/status', (req: Request, res: Response) => {
     res.json({ status: 'online', message: 'Server is running smoothly!' });
 });
@@ -54,6 +53,21 @@ app.patch(
         res.status(200).json(updatedJob);
     }
 );
+
+app.delete('/api/jobs/:id', async (req: Request<{ id: string }>, res: Response) => {
+    try {
+        const { id } = req.params;
+
+        await prisma.jobApplication.delete({
+            where: { id },
+        });
+
+        res.status(204).send();
+    } catch (error) {
+        console.error('Error deleting job application:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
 
 app.post('/api/jobs', async (req: Request, res: Response) =>{
     try {

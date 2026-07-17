@@ -26,12 +26,41 @@ app.get('/api/jobs', async (req: Request, res: Response) => {
     }
 });
 
+type JobUpdateBody = {
+    company?: string;
+    position?: string;
+    status?: string;
+    url?: string;
+    notes?: string;
+};
+
+app.patch(
+    '/api/jobs/:id',
+    async (req: Request<{ id: string }, unknown, JobUpdateBody>, res: Response) => {
+        const { id } = req.params;
+        const { company, position, status, url, notes } = req.body;
+
+        const updatedJob = await prisma.jobApplication.update({
+            where: { id },
+            data: {
+                company,
+                position,
+                status,
+                url,
+                notes,
+            },
+        });
+
+        res.status(200).json(updatedJob);
+    }
+);
+
 app.post('/api/jobs', async (req: Request, res: Response) =>{
     try {
         const { company, position, status, url, notes } = req.body;
 
         if (!company || !position) {
-            res.status(400).json({ error: 'Company and position are requiered fields.' });
+            res.status(400).json({ error: 'Company and position are required fields.' });
             return;
         }
 
